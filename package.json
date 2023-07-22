@@ -1,0 +1,25 @@
+{
+  "name": "college_db_app",
+  "version": "1.0.0",
+  "description": "centralized college database application",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stussy446/college_db_app.git"
+  },
+  "author": "Steve Rector Aaron Jeffrey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stussy446/college_db_app/issues"
+  },
+  "homepage": "https://github.com/stussy446/college_db_app#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "forever": "^0.14.2",
+    "mysql": "^2.18.1",
+    "pm2": "^4.5.6"
+  }
+}
