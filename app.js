@@ -1,13 +1,21 @@
-/*
-    SETUP
-*/
-// Express
-var express = require('express');   // We are using the express library for the web server
-var app     = express();            // We need to instantiate an express object to interact with the server in our code
-PORT        = 65521;                 // Set a port number at the top so it's easy to change in the future
+'use strict';
+
+// Create express instance called app and sets the application's port to 65521
+const express = require('express');   
+const app = express();            
+const PORT = 65521;                 
 
 // Database
 var db = require('./db-connector')
+
+// Allows incoming request objects to be recognized as strings or arrays
+app.use(express.urlencoded({
+    extended: true
+}));
+
+// specifies the public directory as the directory that static assets are served from 
+app.use(express.static('public'));
+
 
 /*
     ROUTES
