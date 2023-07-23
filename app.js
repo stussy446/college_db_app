@@ -1,59 +1,65 @@
-'use strict';
+// Create express instance called app and sets the application's port 
+const express = require('express');
+const app = express();
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(express.static('public'))
 
-// Create express instance called app and sets the application's port to 65521
-const express = require('express');   
-const app = express();            
-const PORT = 65521;                 
+const PORT = 65521;
+
+// app.js
+const { engine } = require('express-handlebars');
+var exphbs = require('express-handlebars');     // Import express-handlebars
+app.engine('.hbs', engine({ extname: ".hbs" }));  // Create an instance of the handlebars engine to process templates
+app.set('view engine', '.hbs');                 // Tell express to use the handlebars engine whenever it encounters a *.hbs file.
 
 // Database
-var db = require('./db-connector')
-
-// Allows incoming request objects to be recognized as strings or arrays
-app.use(express.urlencoded({
-    extended: true
-}));
-
-// specifies the public directory as the directory that static assets are served from 
-app.use(express.static('public'));
-
+const db = require('./database/db-connector')
 
 /*
     ROUTES
 */
-app.get('/', function(req, res)
-    {
-        // Define our queries
-        query1 = 'DROP TABLE IF EXISTS diagnostic;';
-        query2 = 'CREATE TABLE diagnostic(id INT PRIMARY KEY AUTO_INCREMENT, text VARCHAR(255) NOT NULL);';
-        query3 = 'INSERT INTO diagnostic (text) VALUES ("MySQL is working!")';
-        query4 = 'SELECT * FROM diagnostic;';
 
-        // Execute every query in an asynchronous manner, we want each query to finish before the next one starts
+// app.js
+app.get('/', function (req, res) {
+    let query1 = "SELECT * FROM Departments;"
 
-        // DROP TABLE...
-        db.pool.query(query1, function (err, results, fields){
+    db.pool.query(query1, function (error, rows, fields) {
+        res.render('index', { data: rows });
+    })
+});
 
-            // CREATE TABLE...
-            db.pool.query(query2, function(err, results, fields){
 
-                // INSERT INTO...
-                db.pool.query(query3, function(err, results, fields){
+app.post('/add-department-form', function (req, res) {
+    // Capture the incoming data and parse it back to a JS object
+    let data = req.body;
 
-                    // SELECT *...
-                    db.pool.query(query4, function(err, results, fields){
+    // Create the query and run it on the database
+    let query1 = `INSERT INTO Departments (departmentName) VALUES ('${data['input-department']}')`;
+    db.pool.query(query1, function (error, rows, fields) {
 
-                        // Send the results to the browser
-                        let base = "<h1>MySQL Results:</h1>"
-                        res.send(base + JSON.stringify(results));
-                    });
-                });
-            });
-        });
-    });
+        // Check to see if there was an error
+        if (error) {
+
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error)
+            res.sendStatus(400);
+        }
+
+        // If there was no error, we redirect back to our root route, which automatically runs the SELECT * FROM bsg_people and
+        // presents it on the screen
+        else {
+            res.redirect('/');
+        }
+    })
+})
+
 
 /*
     LISTENER
 */
-app.listen(PORT, function(){            // This is the basic syntax for what is called the 'listener' which receives incoming requests on the specified PORT.
+
+// starts application listening to port set at beginning of file
+app.listen(PORT, function () {
     console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
 });
